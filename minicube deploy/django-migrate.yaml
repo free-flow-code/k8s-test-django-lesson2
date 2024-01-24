@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - name: django-migrate-container
+          image: k8s-test-django:latest
+          imagePullPolicy: Never
+          command: ["python", "manage.py",  "migrate", "--no-input"]
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DATABASE_URL
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: ALLOWED_HOSTS
+      restartPolicy: OnFailure    
+  completions: 1
