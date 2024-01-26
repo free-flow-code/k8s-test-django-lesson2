@@ -11,8 +11,7 @@
   - [Миграция базы данных](#migrate)
 - [Развертывание приложения в Yandex Cloud](#yc)
   - [Как задеплоить код](#yc-deploy)
-
-
+  - [Как подготовить dev окружение](#prepare-dev)
 - [Переменные окружения](#environs)
 
 ## Описание <a name="description"></a>
@@ -152,8 +151,31 @@ kubectl  apply -f django-migrate.yaml
 согласно настройкам ALB-роутера. Разверните в кластере веб-сервер:
 
 ```
-kubectl apply -f nginx-deploy.yaml
+kubectl -n <namespace> apply -f nginx-deploy.yaml
 ```
+
+### Как подготовить dev окружение <a name="prepare-dev"></a>
+
+Для подключения к базе данных [скачайте SSL-сертификат](https://cloud.yandex.ru/ru/docs/managed-postgresql/operations/connect#get-ssl-cert)
+для postgresql командой:
+
+```
+mkdir -p ~/.postgresql && \
+wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" \
+     --output-document ~/.postgresql/root.crt && \
+chmod 0600 ~/.postgresql/root.crt
+```
+
+Сертификат будет сохранен в файле `~/.postgresql/root.crt`
+
+Создайте Secret:
+
+```
+kubectl create secret generic postgresql-ssl -n <namespace> --from-file=/path to/root.crt
+```
+
+Посмотреть пример подключения секрета к контейнеру можно в файле
+`yc-sirius/edu-naughty-pike/ubuntu-example.yaml`
 
 ## Переменные окружения <a name="environs"></a>
 
