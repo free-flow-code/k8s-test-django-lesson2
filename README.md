@@ -11,6 +11,8 @@
   - [Миграция базы данных](#migrate)
 - [Развертывание приложения в Yandex Cloud](#yc)
   - [Как задеплоить код](#yc-deploy)
+    - Загрузка DockerImage на DockerHub
+    - Запуск веб-сервера
   - [Как подготовить dev окружение](#prepare-dev)
 - [Переменные окружения](#environs)
 
@@ -146,6 +148,35 @@ kubectl  apply -f django-migrate.yaml
 в директории `yc-sirius/edu-naughty-pike`. Перейдите в нее и следуйте дальнейшим инструкциям.
 
 ### Как задеплоить код <a name="yc-deploy"></a>
+
+#### Загрузка DockerImage на DockerHub
+
+В терминале перейдите в директорию проекта `local-docker`
+и соберите докер-образ командой:
+
+```
+docker build -t <image-name>:<tag> .
+```
+
+Чтобы загрузить образ на [DockerHub](https://hub.docker.com) необходимо зарегистрировать
+там аккаунт и подтвердить почту.
+
+Затем переименуйте образ:
+
+```
+docker tag <image-name>:<tag> YOUR-USERNAME/<image-name>:<tag>
+```
+
+И загрузите:
+
+```
+docker push YOUR-USERNAME/<image-name>:<tag>
+
+```
+
+Замените `YOUR-USERNAME` своим идентификатором Docker ID.
+
+#### Запуск веб-сервера
 
 В файле `nginx-deploy.yaml` змените значение `nodePort: 30321` на свое
 согласно настройкам ALB-роутера. Разверните в кластере веб-сервер:
