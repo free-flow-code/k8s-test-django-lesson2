@@ -6,11 +6,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx-deploy
+      app: nginx-test
   template:
     metadata:
       labels:
-        app: nginx-deploy
+        app: nginx-test
     spec:    
       containers:
         - name: nginx
@@ -21,13 +21,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
- name: nginx-svc
+  name: nginx-svc
 spec:
- type: LoadBalancer
- selector:
-   app: nginx-deploy
- ports:
-   - port: 80
-     targetPort: 80
-     nodePort: 30321
-     protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: nginx-test
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30321
+      protocol: TCP

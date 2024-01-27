@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+  labels:
+    name: django-migrate
+spec:
+  backoffLimit: 2
+  completions: 1
+  activeDeadlineSeconds: 60
+  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: django-migrate
+          image: freeflowcode/k8s-test-django-lesson2:76a9adc
+          imagePullPolicy: IfNotPresent
+          command: ["python", "manage.py",  "migrate", "--no-input"]
+          env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: url
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: django-secret
+                key: secret_key
+          - name: DEBUG
+            valueFrom:
+              secretKeyRef:
+                name: django-secret
+                key: debug
+          - name: ALLOWED_HOSTS
+            valueFrom:
+              secretKeyRef:
+                name: django-secret
+                key: allowed_hosts

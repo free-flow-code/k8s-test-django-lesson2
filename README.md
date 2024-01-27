@@ -12,8 +12,9 @@
 - [Развертывание приложения в Yandex Cloud](#yc)
   - [Как задеплоить код](#yc-deploy)
     - Загрузка DockerImage на DockerHub
-    - Запуск веб-сервера
   - [Как подготовить dev окружение](#prepare-dev)
+  - [Запуск приложения](#start-prod)
+  - [Описание облачной инфраструктуры](#cloud-description)
 - [Переменные окружения](#environs)
 
 ## Описание <a name="description"></a>
@@ -144,8 +145,7 @@ kubectl  apply -f django-migrate.yaml
 
 Установите интерфейс командной строки Yandex Cloud (CLI)
 следуя [инструкциям](https://cloud.yandex.com/en/docs/cli/quickstart).
-Подключитесь к кластеру. Все необходимые манифесты для деплоя находятся
-в директории `yc-sirius/edu-naughty-pike`. Перейдите в нее и следуйте дальнейшим инструкциям.
+Подключитесь к кластеру.
 
 ### Как задеплоить код <a name="yc-deploy"></a>
 
@@ -176,16 +176,17 @@ docker push YOUR-USERNAME/<image-name>:<tag>
 
 Замените `YOUR-USERNAME` своим идентификатором Docker ID.
 
-#### Запуск веб-сервера
-
-В файле `nginx-deploy.yaml` змените значение `nodePort: 30321` на свое
-согласно настройкам ALB-роутера. Разверните в кластере веб-сервер:
-
-```
-kubectl -n <namespace> apply -f nginx-deploy.yaml
-```
-
 ### Как подготовить dev окружение <a name="prepare-dev"></a>
+
+Все необходимые манифесты для деплоя находятся
+в директории `yc-sirius/edu-naughty-pike`. Перейдите в нее.
+
+В файле `django-secret.yaml` подставьте свои значения переменных окружения.
+Создайте secret-файл:
+
+```
+kubectl -n <namespace> apply -f django-secret.yaml
+```
 
 Для подключения к базе данных [скачайте SSL-сертификат](https://cloud.yandex.ru/ru/docs/managed-postgresql/operations/connect#get-ssl-cert)
 для postgresql командой:
@@ -202,11 +203,29 @@ chmod 0600 ~/.postgresql/root.crt
 Создайте Secret:
 
 ```
-kubectl create secret generic postgresql-ssl -n <namespace> --from-file=/path to/root.crt
+kubectl create secret generic postgresql-ssl -n <namespace> --from-file=/path_to/root.crt
 ```
 
-Посмотреть пример подключения секрета к контейнеру можно в файле
-`yc-sirius/edu-naughty-pike/ubuntu-example.yaml`
+### Запуск приложения <a name="start-prod"></a>
+
+В файле `django-deploy.yaml` змените значение `nodePort: 30321` на свое
+согласно настройкам ALB-роутера. Разверните в кластере джанго-приложение:
+
+```
+kubectl -n <namespace> apply -f django-deploy.yaml
+```
+
+И примените миграции:
+
+```
+kubectl -n <namespace> apply -f django-migrate.yaml
+```
+
+Сайт доступен по ссылке [edu-naughty-pike.sirius-k8s.dvmn.org](https://edu-naughty-pike.sirius-k8s.dvmn.org)
+
+### Описание облачной инфраструктуры <a name="cloud-description"></a>
+
+[Серверная инфраструктура: edu-naughty-pike](https://sirius-env-registry.website.yandexcloud.net/edu-naughty-pike.html)
 
 ## Переменные окружения <a name="environs"></a>
 

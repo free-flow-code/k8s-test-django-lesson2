@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /webapp
 COPY requirements.txt /webapp/
-RUN apt update && apt install -y python3-pip                                  \
+RUN apt update && apt install -y python3-pip postgresql-client                \
     && pip3 install -r requirements.txt                                       \
     && apt remove -y python3-pip                                              \
     && apt autoremove --purge -y                                              \
