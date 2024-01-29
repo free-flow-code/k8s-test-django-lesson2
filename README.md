@@ -208,11 +208,17 @@ kubectl create secret generic postgresql-ssl -n <namespace> --from-file=/path_to
 
 ### Запуск приложения <a name="start-prod"></a>
 
-В файле `django-deploy.yaml` змените значение `nodePort: 30321` на свое
-согласно настройкам ALB-роутера. Разверните в кластере джанго-приложение:
+Разверните в кластере джанго-приложение:
 
 ```
 kubectl -n <namespace> apply -f django-deploy.yaml
+```
+
+В файле `django-service.yaml` змените значение `nodePort: 30321` на свое
+согласно настройкам ALB-роутера. Запустите сервис:
+
+```
+kubectl -n <namespace> apply -f django-service.yaml
 ```
 
 И примените миграции:
