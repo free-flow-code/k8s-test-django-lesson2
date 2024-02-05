@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: django-svc
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: django-app
   ports:
